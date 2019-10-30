@@ -70,8 +70,9 @@ int main(int argc, char *argv[])
         str.remove(logger);
         if(iter == 0){
             std::string sum_cmd="bulk: ";
-            for(const string & str : cmd_str)
+            for(const string & str : cmd_str){
                 sum_cmd=sum_cmd+str+" ";
+            }
             std::cout<<sum_cmd;
             logger.info(sum_cmd);
             iter=n;
