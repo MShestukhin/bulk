@@ -25,7 +25,7 @@ public:
         std::stringstream ss;
         ss << seconds;
 
-        file_name="bulk"+ss.str();
+        file_name="bulk"+ss.str()+".log";
         std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
     }
 };
