@@ -10,6 +10,18 @@ void logger::init(std::string path_log){
     std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
 }
 
+virtual void logger::handleEvent(const SupervisedString& ref){
+    time_t     now = time(0);
+    time_t seconds;
+    time(&seconds);
+
+    std::stringstream ss;
+    ss << seconds;
+
+    file_name="bulk"+ss.str()+".log";
+    std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
+}
+
 std::string logger::currentDateTime(std::string format) {
     time_t     now = time(0);
     struct tm  tstruct;
@@ -21,18 +33,11 @@ std::string logger::currentDateTime(std::string format) {
 void logger::info(std::string s){
     msg(s,"INFO");
 }
-void logger::warning(std::string s){
-    msg(s,"WARNING");
-}
-void logger::error(std::string s){
-    msg(s,"WARNING");
-}
 
 void logger::msg(std::string s, std::string inf_level){
     std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
      if (ifs.is_open())
      {
-//         ifs <<currentDateTime("%d.%m.%Y %H:%M:%S")<<"\t"+inf_level+"\t"<< s+"\n";
          ifs << s+"\n";
          ifs.close();
      }

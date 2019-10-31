@@ -3,8 +3,6 @@
 #include "logger.h"
 using namespace std;
 
-vector<string> cmd_str;
-int iter=0;
 class Reflector: public IObserver // Prints the observed string into cout
 {
 public:

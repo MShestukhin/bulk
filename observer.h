@@ -5,6 +5,9 @@
 #include <vector>
 using namespace std;
 class SupervisedString;
+static vector<string> cmd_str;
+static int iter=0;
+
 class IObserver
 {
 public:
