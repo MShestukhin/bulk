@@ -2,16 +2,15 @@
 #include <string>
 #include "logger.h"
 using namespace std;
-
 vector<string> cmd_str;
-int iter=0;
+
 class Reflector: public IObserver // Prints the observed string into cout
 {
 public:
     virtual void handleEvent(const SupervisedString& ref)
     {
         if(ref.get() != "}" && ref.get() !="{")
-            cmd_str.push_back(ref.get());
+            logger::cmd_str.push_back(ref.get());
     }
 };
 
@@ -21,7 +20,7 @@ class Counter: public IObserver // Prints the length of observed string into cou
 public:
   virtual void handleEvent(const SupervisedString& ref)
   {
-      iter--;
+      logger::iter--;
   }
 };
 
@@ -33,11 +32,11 @@ public:
   {
         if(ref.get()=="{"){
             local_iter=local_iter+1;
-            iter=local_iter;
+            logger::iter=local_iter;
         }
         if(ref.get()=="}"){
             local_iter=local_iter-1;
-            iter=local_iter;
+            logger::iter=local_iter;
         }
 
   }
@@ -48,7 +47,7 @@ int ObjCounter::local_iter=0;
 int main(int argc, char *argv[])
 {
     int n=atoi(argv[1]);
-    iter=n;
+    logger::iter=n;
     SupervisedString str;
     Reflector refl;
     Counter cnt;
@@ -68,20 +67,10 @@ int main(int argc, char *argv[])
         }
         str.reset(cmd);
         str.remove(logger);
-        if(iter == 0){
-            std::string sum_cmd="bulk: ";
-            for (auto str = cmd_str.begin(); str != cmd_str.end(); ++str) {
-                sum_cmd=sum_cmd+*str;
-                if(str!=cmd_str.end()-1)
-                    sum_cmd+=", ";
-            }
-            std::cout<<sum_cmd;
-            logger.info(sum_cmd);
-            iter=n;
-            cmd_str.clear();
+        if(logger::iter == 0){
+            logger::iter=n;
             str.remove(cnt);
             str.add(cnt);
-            std::cout<<std::endl;
         }
     }
     return 0;
