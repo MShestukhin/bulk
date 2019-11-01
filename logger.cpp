@@ -23,53 +23,42 @@ void logger::info(std::string s){
 //    msg(s,"INFO");
 }
 
-void logger::cmd_line_log_thread(){
-    while(1){
-        if(iter == 0){
-            std::string sum_cmd="bulk: ";
-            for (auto str = cmd_str.begin(); str != cmd_str.end(); ++str) {
-                sum_cmd=sum_cmd+*str;
-                if(str!=cmd_str.end()-1)
-                    sum_cmd+=", ";
-            }
-            std::cout<<sum_cmd<<"\n";
-            cmd_str.clear();
-        }
-    }
+
+void logger::run_threads(vector<string> cmd_local){
+    std::thread thr(cmd_line_log_thread, std::ref(cmd_local));
+    std::thread thr1(file_log_thread_one, std::ref(cmd_local));
+//    std::thread thr2(file_log_thread_two, std::ref(cmd_local));
+    thr1.join();
+//    thr2.join();
+    thr.join();
 }
 
-void logger::file_log_thread_one(){
-    while(1){
-        if(iter == 0){
-            std::string sum_cmd="bulk: ";
-            for (auto str = cmd_str.begin(); str != cmd_str.end(); ++str) {
-                sum_cmd=sum_cmd+*str;
-                if(str!=cmd_str.end()-1)
-                    sum_cmd+=", ";
-            }
-            msg(sum_cmd);
-            cmd_str.clear();
-        }
+std::string get_line(std::vector<string> &cmd_local){
+    std::string sum_cmd="bulk: ";
+    for (auto str = cmd_local.begin(); str != cmd_local.end(); ++str) {
+        sum_cmd=sum_cmd+*str;
+        if(str!=cmd_local.end()-1)
+            sum_cmd+=", ";
     }
+    return sum_cmd;
 }
 
-void logger::file_log_thread_two(){
-    while(1){
-        if(iter == 0){
-            std::string sum_cmd="bulk: ";
-            for (auto str = cmd_str.begin(); str != cmd_str.end(); ++str) {
-                sum_cmd=sum_cmd+*str;
-                if(str!=cmd_str.end()-1)
-                    sum_cmd+=", ";
-            }
-            msg(sum_cmd);
-            cmd_str.clear();
-        }
-    }
+void logger::cmd_line_log_thread(vector<string> &cmd_local){
+    std::cout<<get_line(cmd_local)<<"\n";
+
+}
+
+void logger::file_log_thread_one(vector<string> &cmd_local){
+    msg(get_line(cmd_local));
+}
+
+void logger::file_log_thread_two(vector<string> &cmd_local){
+    msg(get_line(cmd_local));
 }
 
 
 int logger::iter=0;
+bool logger::first_thread;
 std::vector<std::string> logger::cmd_str;
 
 void logger::msg(std::string s){

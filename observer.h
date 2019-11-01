@@ -27,7 +27,7 @@ class SupervisedString // Observable class
 public:
     void add(IObserver& ref)
     {
-        _observers.push_back(&ref);
+        _observers.push_front(&ref);
     }
 
     void remove(IObserver& ref)

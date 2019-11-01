@@ -42,6 +42,18 @@ public:
   }
 };
 
+class IterLookup: public IObserver // Prints the length of observed string into cout
+{
+public:
+  virtual void handleEvent(const SupervisedString& ref)
+  {
+        if(logger::iter == 0){
+            logger::run_threads(logger::cmd_str);
+            logger::cmd_str.clear();
+        }
+  }
+};
+
 int ObjCounter::local_iter=0;
 
 int main(int argc, char *argv[])
@@ -51,8 +63,10 @@ int main(int argc, char *argv[])
     SupervisedString str;
     Reflector refl;
     Counter cnt;
+    IterLookup iterLookup;
     logger logger;
     ObjCounter objCnt;
+    str.add(iterLookup);
     str.add(refl);
     str.add(cnt);
     str.add(objCnt);
@@ -63,7 +77,7 @@ int main(int argc, char *argv[])
         if(cmd == "}" || cmd =="{"){
             str.remove(cnt);
             if(!ObjCounter::local_iter)
-                cmd_str.clear();
+                logger::cmd_str.clear();
         }
         str.reset(cmd);
         str.remove(logger);
