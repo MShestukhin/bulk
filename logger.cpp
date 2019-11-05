@@ -23,14 +23,32 @@ void logger::info(std::string s){
 //    msg(s,"INFO");
 }
 
+mutex lk;
+static int a=0;
+void iter_t(std::ofstream &ifs,vector<string> &cmd_local){
+    if(a<cmd_local.size()){
+        lk.lock();
+        ifs<<cmd_local.at(a);
+        if(a<cmd_local.size()-1)
+            ifs<<", ";
+        a++;
+        lk.unlock();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        return iter_t(ifs,cmd_local);
+    }
+    return;
+}
 
 void logger::run_threads(vector<string> cmd_local){
-    std::thread thr(cmd_line_log_thread, std::ref(cmd_local));
-    std::thread thr1(file_log_thread_one, std::ref(cmd_local));
-//    std::thread thr2(file_log_thread_two, std::ref(cmd_local));
+//    std::thread thr(cmd_line_log_thread, std::ref(cmd_local));
+    a=0;
+    std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
+    std::thread thr1(iter_t,std::ref(ifs),std::ref(cmd_local));
+    std::thread thr2(iter_t,std::ref(ifs),std::ref(cmd_local));
     thr1.join();
-//    thr2.join();
-    thr.join();
+    thr2.join();
+    ifs.close();
+//    thr.join();
 }
 
 std::string get_line(std::vector<string> &cmd_local){
@@ -44,16 +62,22 @@ std::string get_line(std::vector<string> &cmd_local){
 }
 
 void logger::cmd_line_log_thread(vector<string> &cmd_local){
-    std::cout<<get_line(cmd_local)<<"\n";
+    std::string sum_cmd="bulk: ";
+    for (auto str = cmd_local.begin(); str != cmd_local.end(); ++str) {
+        sum_cmd=sum_cmd+*str;
+        if(str!=cmd_local.end()-1)
+            sum_cmd+=", ";
+    }
+    std::cout<<sum_cmd<<"\n";
 
 }
 
 void logger::file_log_thread_one(vector<string> &cmd_local){
-    msg(get_line(cmd_local));
+        msg(get_line(cmd_local));
 }
 
 void logger::file_log_thread_two(vector<string> &cmd_local){
-    msg(get_line(cmd_local));
+        msg(get_line(cmd_local));
 }
 
 
@@ -62,8 +86,6 @@ bool logger::first_thread;
 std::vector<std::string> logger::cmd_str;
 
 void logger::msg(std::string s){
-    mutex lock;
-    lock.lock();
     std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
      if (ifs.is_open())
      {
@@ -72,7 +94,6 @@ void logger::msg(std::string s){
      }
      else
          std::cout << "Error opening file\n";
-     lock.unlock();
 }
 
 
