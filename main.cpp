@@ -2,7 +2,9 @@
 #include <string>
 #include "logger.h"
 using namespace std;
+
 vector<string> cmd_str;
+int iter=0;
 
 class Reflector: public IObserver // Prints the observed string into cout
 {
@@ -10,7 +12,7 @@ public:
     virtual void handleEvent(const SupervisedString& ref)
     {
         if(ref.get() != "}" && ref.get() !="{")
-            logger::cmd_str.push_back(ref.get());
+            cmd_str.push_back(ref.get());
     }
 };
 
@@ -20,7 +22,7 @@ class Counter: public IObserver // Prints the length of observed string into cou
 public:
   virtual void handleEvent(const SupervisedString& ref)
   {
-      logger::iter--;
+      iter--;
   }
 };
 
@@ -32,11 +34,11 @@ public:
   {
         if(ref.get()=="{"){
             local_iter=local_iter+1;
-            logger::iter=local_iter;
+            iter=local_iter;
         }
         if(ref.get()=="}"){
             local_iter=local_iter-1;
-            logger::iter=local_iter;
+            iter=local_iter;
         }
 
   }
@@ -47,19 +49,18 @@ class IterLookup: public IObserver // Prints the length of observed string into 
 public:
   virtual void handleEvent(const SupervisedString& ref)
   {
-        if(logger::iter == 0){
-            logger::run_threads(logger::cmd_str);
-            logger::cmd_str.clear();
+        if(iter == 0){
+            logger::run_threads(cmd_str);
+            cmd_str.clear();
         }
   }
 };
 
 int ObjCounter::local_iter=0;
-
 int main(int argc, char *argv[])
 {
     int n=atoi(argv[1]);
-    logger::iter=n;
+    iter=n;
     SupervisedString str;
     Reflector refl;
     Counter cnt;
@@ -77,12 +78,12 @@ int main(int argc, char *argv[])
         if(cmd == "}" || cmd =="{"){
             str.remove(cnt);
             if(!ObjCounter::local_iter)
-                logger::cmd_str.clear();
+                cmd_str.clear();
         }
         str.reset(cmd);
         str.remove(logger);
-        if(logger::iter == 0){
-            logger::iter=n;
+        if(iter == 0){
+            iter=n;
             str.remove(cnt);
             str.add(cnt);
         }

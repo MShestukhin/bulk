@@ -40,15 +40,20 @@ void iter_t(std::ofstream &ifs,vector<string> &cmd_local){
 }
 
 void logger::run_threads(vector<string> cmd_local){
-//    std::thread thr(cmd_line_log_thread, std::ref(cmd_local));
-    a=0;
     std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
+    a=0;
+    if (ifs.is_open())
+    {
+        ifs <<"bulk: ";
+    }
+    std::thread thr(cmd_line_log_thread, std::ref(cmd_local));
     std::thread thr1(iter_t,std::ref(ifs),std::ref(cmd_local));
     std::thread thr2(iter_t,std::ref(ifs),std::ref(cmd_local));
+    thr.join();
     thr1.join();
     thr2.join();
+    ifs <<"\n";
     ifs.close();
-//    thr.join();
 }
 
 std::string get_line(std::vector<string> &cmd_local){
@@ -81,7 +86,6 @@ void logger::file_log_thread_two(vector<string> &cmd_local){
 }
 
 
-int logger::iter=0;
 bool logger::first_thread;
 std::vector<std::string> logger::cmd_str;
 
