@@ -27,4 +27,7 @@ deploy:
   skip_cleanup: true
   script: 
   - curl -T bulkmt-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -umshestukhin:$BINTRAY_API_KEY "https://api.bintray.com/content/2501/10.homework/bulkmt/$TRAVIS_BUILD_NUMBER/bulkmt-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+  on:
+    tags: true
+    all_branches: true
 
