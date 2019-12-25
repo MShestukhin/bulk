@@ -6,6 +6,7 @@ else ()
     project(bulk VERSION 0.0.1)
 endif()
 
+
 FILE(GLOB_RECURSE LibFiles "*.h")
 
 add_custom_target(headers SOURCES ${LibFiles})
