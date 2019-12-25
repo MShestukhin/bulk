@@ -10,7 +10,7 @@ void logger::init(std::string path_log){
     std::ofstream ifs(file_name.c_str(), std::ios_base::in | std::ios_base::app);
 }
 
-virtual void logger::handleEvent(const SupervisedString& ref){
+void logger::handleEvent(const SupervisedString& ref){
     time_t     now = time(0);
     time_t seconds;
     time(&seconds);
